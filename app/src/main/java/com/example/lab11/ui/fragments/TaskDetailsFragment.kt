@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.lab11.R
 import com.example.lab11.data.models.Task
 import com.example.lab11.databinding.FragmentTaskDetailsBinding
 import com.example.lab11.ui.viewmodels.TaskViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 
 class TaskDetailsFragment : Fragment(R.layout.fragment_task_details) {
@@ -37,10 +39,12 @@ class TaskDetailsFragment : Fragment(R.layout.fragment_task_details) {
         taskId = arguments?.let {
             TaskDetailsFragmentArgs.fromBundle(it).taskId
         }
-        taskViewModel.getTaskById(taskId!!).observe(viewLifecycleOwner) { task ->
-            task?.let {
-                this.task = it
-                updateUI()
+        lifecycleScope.launch {
+            taskId?.let { id ->
+                taskViewModel.getTaskById(id)?.let { fetchedTask ->
+                    task = fetchedTask
+                    updateUI()
+                }
             }
         }
         binding.editTaskButton.setOnClickListener {

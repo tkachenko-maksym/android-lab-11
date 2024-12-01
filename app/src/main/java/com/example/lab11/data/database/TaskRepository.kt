@@ -4,12 +4,9 @@ import androidx.lifecycle.LiveData
 import com.example.lab11.data.models.Task
 
 class TaskRepository(private val taskDao: TaskDao) {
+    suspend fun getAllTasks(): List<Task> = taskDao.getAllTasks()
 
-    val allTasksLiveData: LiveData<List<Task>> = taskDao.getAllTasks()
-
-    fun getTaskById(taskId: Int): LiveData<Task?> {
-        return taskDao.getTaskById(taskId)
-    }
+    suspend fun getTaskById(taskId: Int): Task? = taskDao.getTaskById(taskId)
 
     suspend fun insert(task: Task) {
         taskDao.insert(task)

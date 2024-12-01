@@ -20,11 +20,8 @@ interface TaskDao {
     suspend fun delete(task: Task)
 
     @Query("SELECT * FROM tasks ORDER BY dateCreated DESC")
-    fun getAllTasks(): LiveData<List<Task>>
+    suspend fun getAllTasks(): List<Task>
 
     @Query("SELECT * FROM tasks WHERE id = :taskId")
-    fun getTaskById(taskId: Int): LiveData<Task?>
-
-//    @Query("SELECT * FROM tasks WHERE name LIKE :searchQuery OR description LIKE :searchQuery ORDER BY dateCreated DESC")
-//    fun getTaskByNameOrDesc(searchQuery: String): List<Task>
+    suspend fun getTaskById(taskId: Int): Task?
 }

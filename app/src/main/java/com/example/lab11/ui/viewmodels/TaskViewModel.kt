@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: TaskRepository
-
-    private val allTasks: LiveData<List<Task>>
+    private val _allTasks = MutableLiveData<List<Task>>()
+    private val allTasks: LiveData<List<Task>> = _allTasks
 
     private val searchQuery = MutableLiveData("")
     //true for ascending, false for descending
@@ -24,7 +24,13 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val taskDao = TaskDatabase.getInstance(application)!!.taskDao()
         repository = TaskRepository(taskDao)
-        allTasks = repository.allTasksLiveData
+        loadTasks()
+    }
+
+    private fun loadTasks() {
+        viewModelScope.launch {
+            _allTasks.value = repository.getAllTasks()
+        }
     }
 
     val filteredTasks: LiveData<List<Task>> = allTasks.switchMap { tasks ->
@@ -64,7 +70,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         searchQuery.value = query
     }
 
-    fun getTaskById(taskId: Int): LiveData<Task?> {
+    suspend fun getTaskById(taskId: Int): Task? {
         return repository.getTaskById(taskId)
     }
 
